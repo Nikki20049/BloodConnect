@@ -61,7 +61,7 @@ def user_profile(request):
 @login_required
 def complete_donor_profile(request):
     try:
-        profile = request.user.donor_profile
+        profile = request.user.donor_profile 
     except DonorProfile.DoesNotExist:
         profile = DonorProfile.objects.create(user=request.user)
     

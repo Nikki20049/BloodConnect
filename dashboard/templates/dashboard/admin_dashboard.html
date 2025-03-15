@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load dashboard_tags %}
 
 {% block title %}Admin Dashboard - BloodConnect{% endblock %}
 
@@ -14,7 +15,7 @@
             <div class="stat-number">{{ pending_requests }}</div>
             <div class="stat-title">Pending Requests</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card"> 
             <div class="stat-icon">✅</div>
             <div class="stat-number">{{ fulfilled_requests }}</div>
             <div class="stat-title">Fulfilled Requests</div>

@@ -73,14 +73,14 @@ def view_request(request, request_id):
     }
     return render(request, 'requests/request_detail.html', context)
 
-@login_required
 def update_request_status(request, request_id):
-    if request.user.user_type not in ['admin', 'ngo']:
+    blood_request = get_object_or_404(BloodRequest, id=request_id)
+
+    # Allow only admins, NGO users, or the original requester
+    if request.user.user_type not in ['admin', 'ngo'] and request.user != blood_request.requester:
         messages.error(request, 'You do not have permission to update request status.')
         return redirect('view_request', request_id=request_id)
-    
-    blood_request = get_object_or_404(BloodRequest, id=request_id)
-    
+
     if request.method == 'POST':
         form = RequestStatusForm(request.POST, instance=blood_request)
         if form.is_valid():
@@ -96,8 +96,9 @@ def update_request_status(request, request_id):
             )
             
             messages.success(request, 'Request status updated successfully.')
-    
+
     return redirect('view_request', request_id=request_id)
+
 
 @login_required
 def my_requests(request):

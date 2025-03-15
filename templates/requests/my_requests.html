@@ -1,5 +1,43 @@
 {% extends 'base.html' %}
+
+{% block title %}My Blood Requests{% endblock %}
+
 {% block content %}
-<h2>My Requests</h2>
-<p>List of blood donation requests created by the user.</p>
+<div class="container mt-4">
+    <div class="title_button">
+    <h1>My Blood Requests</h1>
+
+    <a href="{% url 'create_blood_request' %}" class="btn btn-primary mb-3">Create New Request</a>
+    </div>
+ <!-- Button to create a new blood request -->
+    {% if requests %}
+        <div class="request-list">
+            {% for request in requests %}
+                <div class="request-item urgency-{{ request.urgency }} status-{{ request.status }}">
+                    <div class="request-details">
+                        <div class="request-header">
+                            <span class="blood-group">{{ request.blood_group }}</span>
+                            <span class="urgency-badge">{{ request.get_urgency_display }}</span>
+                            <span class="status-badge">{{ request.get_status_display }}</span>
+                        </div>
+                        <h3>{{ request.hospital_name }}</h3>
+                        <p><strong>Location:</strong> {{ request.hospital_address }}</p>
+                        <p><strong>Units Needed:</strong> {{ request.units_needed }}</p>
+                        <p><strong>Needed By:</strong> {{ request.needed_by|date:"M d, Y H:i" }}</p>
+                        <p><strong>Created On:</strong> {{ request.created_at|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="request-actions">
+                        <a href="{% url 'view_request' request.id %}" class="btn btn-info">View Details</a>
+
+                        {% if request.status != 'fulfilled' %}
+                            <a href="{% url 'update_request_status' request.id %}" class="btn btn-warning">Update Status</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No blood requests found. <a href="{% url 'create_blood_request' %}">Create a new request</a>.</p>
+    {% endif %}
+</div>
 {% endblock %}

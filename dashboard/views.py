@@ -82,11 +82,12 @@ def user_dashboard(request):
         return redirect('donor_dashboard')
     elif request.user.user_type in ['admin', 'ngo']:
         return redirect('admin_dashboard')
+    else:
+        return redirect('my_requests')
+    # # Regular user dashboard
+    # my_requests = BloodRequest.objects.filter(requester=request.user).order_by('-created_at')
     
-    # Regular user dashboard
-    my_requests = BloodRequest.objects.filter(requester=request.user).order_by('-created_at')
-    
-    context = {
-        'my_requests': my_requests,
-    }
-    return render(request, 'dashboard/user_dashboard.html', context)
+    # context = {
+    #     'my_requests': my_requests,
+    # }
+    # return render(request, 'dashboard/user_dashboard.html', context)
