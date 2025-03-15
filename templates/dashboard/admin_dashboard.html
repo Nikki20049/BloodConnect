@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+</div>
+
+<div class="stats-section">
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">🩸</div>
+            <div class="stat-number">{{ pending_requests }}</div>
+            <div class="stat-title">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number">{{ fulfilled_requests }}</div>
+            <div class="stat-title">Fulfilled Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💉</div>
+            <div class="stat-number">{{ total_donations }}</div>
+            <div class="stat-title">Total Donations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ total_donors }}</div>
+            <div class="stat-title">Registered Donors</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-main">
+        <div class="dashboard-card">
+            <h3>Donations Pending Verification</h3>
+            {% if pending_verifications %}
+                <div class="donation-list">
+                    {% for donation in pending_verifications %}
+                        <div class="donation-item">
+                            <div class="donor-info">
+                                <div class="donor-avatar">
+                                    {% if donation.donor.profile_picture %}
+                                        <img src="{{ donation.donor.profile_picture.url }}" alt="{{ donation.donor.username }}">
+                                    {% else %}
+                                        <div class="avatar-placeholder">{{ donation.donor.username|first|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="donor-details">
+                                    <h3>{{ donation.donor.get_full_name|default:donation.donor.username }}</h3>
+                                    <p>Donated {{ donation.units }} unit(s) at {{ donation.hospital }}</p>
+                                    <p class="donation-date">{{ donation.donation_date|date:"M d, Y" }}</p>
+                                    {% if donation.blood_request %}
+                                        <p>For request: <a href="{% url 'view_request' donation.blood_request.id %}">View Request</a></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="donation-actions">
+                                <a href="{% url 'verify_donation' donation.id %}" class="btn-primary verify-donation-btn">Verify Donation</a>
+                                <a href="{% url 'donation_detail' donation.id %}" class="btn-secondary">View Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-results">No donations pending verification.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Recent Blood Requests</h3>
+            {% if recent_requests %}
+                <div class="request-list">
+                    {% for request in recent_requests %}
+                        <div class="request-item urgency-{{ request.urgency }} status-{{ request.status }}">
+                            <div class="request-details">
+                                <div class="request-header">
+                                    <span class="blood-group">{{ request.blood_group }}</span>
+                                    <span class="urgency-badge">{{ request.get_urgency_display }}</span>
+                                    <span class="status-badge">{{ request.get_status_display }}</span>
+                                </div>
+                                <h4>{{ request.hospital_name }}</h4>
+                                <p>Requester: {{ request.requester.username }}</p>
+                                <p>Created: {{ request.created_at|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="request-actions">
+                                <a href="{% url 'view_request' request.id %}" class="btn-secondary">View Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'search_requests' %}" class="btn-text">View All Requests</a>
+                </div>
+            {% else %}
+                <p class="no-results">No blood requests yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-sidebar">
+        <div class="dashboard-card">
+            <h3>Blood Group Statistics</h3>
+            {% if blood_group_stats %}
+                <div class="blood-group-stats">
+                    {% for stat in blood_group_stats %}
+                        <div class="blood-group-stat">
+                            <div class="blood-group">{{ stat.blood_group__name }}</div>
+                            <div class="stat-bar" style="width: {{ stat.count|percentage_of_max:blood_group_stats }}%">
+                                <span class="stat-value">{{ stat.count }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-results">No blood request data available.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Recent Donations</h3>
+            {% if recent_donations %}
+                <div class="donation-list">
+                    {% for donation in recent_donations %}
+                        <div class="donation-item">
+                            <div class="donation-details">
+                                <div class="donation-header">
+                                    <span class="donation-date">{{ donation.donation_date|date:"M d, Y" }}</span>
+                                    {% if donation.verification_date %}
+                                        <span class="verification-badge">Verified</span>
+                                    {% else %}
+                                        <span class="verification-badge verification-pending">Pending</span>
+                                    {% endif %}
+                                </div>
+                                <p>{{ donation.donor.username }} donated {{ donation.units }} unit(s)</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-results">No donations recorded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

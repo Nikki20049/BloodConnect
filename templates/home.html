@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}BloodConnect - Connect Donors with Recipients{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Donate Blood, Save Lives</h1>
+        <p>Your donation can make a difference in someone's life.</p>
+        <div class="hero-buttons">
+            {% if user.is_authenticated %}
+                {% if user.user_type == 'donor' %}
+                    <a href="{% url 'donor_dashboard' %}" class="btn-primary">Donor Dashboard</a>
+                {% else %}
+                    <a href="{% url 'create_blood_request' %}" class="btn-primary">Request Blood</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'register' %}" class="btn-primary">Register Now</a>
+                <a href="{% url 'login' %}" class="btn-secondary">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">❤️</div>
+            <div class="stat-number">{{ urgent_requests.count }}</div>
+            <div class="stat-title">Urgent Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💉</div>
+            <div class="stat-number">{{ recent_donations.count }}</div>
+            <div class="stat-title">Recent Donations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ top_donors.count }}</div>
+            <div class="stat-title">Active Donors</div>
+        </div>
+    </div>
+</section>
+
+<section class="urgent-requests">
+    <h2>Urgent Blood Requests</h2>
+    {% if urgent_requests %}
+        <div class="request-cards">
+            {% for request in urgent_requests %}
+                <div class="request-card urgency-{{ request.urgency }}">
+                    <div class="request-header">
+                        <span class="blood-group">{{ request.blood_group }}</span>
+                        <span class="urgency-badge">{{ request.get_urgency_display }}</span>
+                    </div>
+                    <div class="request-body">
+                        <h3>{{ request.hospital_name }}</h3>
+                        <p>{{ request.hospital_address }}</p>
+                        <p>Units needed: {{ request.units_needed }}</p>
+                        <p>Needed by: {{ request.needed_by|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="request-footer">
+                        <a href="{% url 'view_request' request.id %}" class="btn-secondary">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No urgent requests at the moment.</p>
+    {% endif %}
+    <div class="section-footer">
+        <a href="{% url 'search_requests' %}" class="btn-text">View All Requests</a>
+    </div>
+</section>
+
+<section class="recent-donations">
+    <h2>Recent Donations</h2>
+    {% if recent_donations %}
+        <div class="donation-list">
+            {% for donation in recent_donations %}
+                <div class="donation-item">
+                    <div class="donor-info">
+                        <div class="donor-avatar">
+                            {% if donation.donor.profile_picture %}
+                                <img src="{{ donation.donor.profile_picture.url }}" alt="{{ donation.donor.username }}">
+                            {% else %}
+                                <div class="avatar-placeholder">{{ donation.donor.username|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="donor-details">
+                            <h3>{{ donation.donor.get_full_name|default:donation.donor.username }}</h3>
+                            <p>Donated {{ donation.units }} unit(s) at {{ donation.hospital }}</p>
+                            <p class="donation-date">{{ donation.donation_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    {% if donation.blood_request %}
+                        <a href="{% url 'view_request' donation.blood_request.id %}" class="btn-text">View Request</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No recent donations.</p>
+    {% endif %}
+</section>
+
+<section class="top-donors">
+    <h2>Top Donors</h2>
+    {% if top_donors %}
+        <div class="donor-cards">
+            {% for donor in top_donors %}
+                <div class="donor-card">
+                    <div class="donor-rank">{{ forloop.counter }}</div>
+                    <div class="donor-avatar">
+                        {% if donor.profile_picture %}
+                            <img src="{{ donor.profile_picture.url }}" alt="{{ donor.username }}">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ donor.username|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="donor-name">{{ donor.get_full_name|default:donor.username }}</div>
+                    <div class="donor-donations">{{ donor.donation_count }} donations</div>
+                    {% if donor.badges.exists %}
+                        <div class="donor-badges">
+                            {% for user_badge in donor.badges.all|slice:":3" %}
+                                <span class="badge-icon" title="{{ user_badge.badge.name }}">🏅</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No donors yet.</p>
+    {% endif %}
+    <div class="section-footer">
+        <a href="{% url 'leaderboard' %}" class="btn-text">View Full Leaderboard</a>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Make a Difference?</h2>
+        <p>Join our community of blood donors and help save lives.</p>
+        {% if user.is_authenticated %}
+            {% if user.user_type == 'donor' %}
+                <a href="{% url 'donor_dashboard' %}" class="btn-primary">Go to Dashboard</a>
+            {% else %}
+                <a href="{% url 'create_blood_request' %}" class="btn-primary">Request Blood</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'register' %}" class="btn-primary">Register as a Donor</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

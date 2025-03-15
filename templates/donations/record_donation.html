@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Donation - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Record Blood Donation</h2>
+    
+    {% if blood_request %}
+        <div class="request-summary">
+            <h3>Donation for Request:</h3>
+            <div class="request-info">
+                <div class="blood-group">{{ blood_request.blood_group }}</div>
+                <div class="request-details">
+                    <p><strong>Hospital:</strong> {{ blood_request.hospital_name }}</p>
+                    <p><strong>Patient:</strong> {{ blood_request.patient_name }}</p>
+                    <p><strong>Urgency:</strong> {{ blood_request.get_urgency_display }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_units" class="form-label">Units Donated</label>
+            <input type="number" name="units" id="id_units" class="form-control" value="1" min="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_hospital" class="form-label">Hospital/Donation Center</label>
+            <input type="text" name="hospital" id="id_hospital" class="form-control" value="{{ form.hospital.value|default:'' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_donation_date" class="form-label">Donation Date</label>
+            <input type="datetime-local" name="donation_date" id="id_donation_date" class="form-control" required>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Record Donation</button>
+            <a href="{% if blood_request %}{% url 'view_request' blood_request.id %}{% else %}{% url 'donor_dashboard' %}{% endif %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+    
+    <div class="form-info">
+        <h3>Important Information</h3>
+        <ul>
+            <li>Your donation will be recorded but requires verification by an admin or NGO.</li>
+            <li>After donating, you should wait at least 3 months before donating again.</li>
+            <li>Make sure to stay hydrated and eat well before and after donation.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

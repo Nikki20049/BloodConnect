@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Complete Donor Profile - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Complete Your Donor Profile</h2>
+    <p class="form-subtitle">Please provide the following information to complete your donor profile.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_blood_group" class="form-label">Blood Group</label>
+            <select name="blood_group" id="id_blood_group" class="form-control" required>
+                <option value="">Select your blood group</option>
+                {% for blood_group in form.fields.blood_group.queryset %}
+                    <option value="{{ blood_group.id }}">{{ blood_group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_weight" class="form-label">Weight (kg)</label>
+            <input type="number" name="weight" id="id_weight" class="form-control" step="0.01">
+            <div class="form-help">Your weight in kilograms. This helps determine eligibility for donation.</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_medical_conditions" class="form-label">Medical Conditions</label>
+            <textarea name="medical_conditions" id="id_medical_conditions" class="form-control" rows="3"></textarea>
+            <div class="form-help">List any medical conditions that might affect your ability to donate blood.</div>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" name="is_available" id="id_is_available" checked>
+                <label for="id_is_available">I am available for blood donation</label>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Complete Profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

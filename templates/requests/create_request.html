@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Blood Request - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Create Blood Request</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_blood_group" class="form-label">Blood Group</label>
+            <select name="blood_group" id="id_blood_group" class="form-control" required>
+                <option value="">Select blood group</option>
+                {% for blood_group in form.fields.blood_group.queryset %}
+                    <option value="{{ blood_group.id }}">{{ blood_group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_units_needed" class="form-label">Units Needed</label>
+            <input type="number" name="units_needed" id="id_units_needed" class="form-control" value="1" min="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_hospital_name" class="form-label">Hospital Name</label>
+            <input type="text" name="hospital_name" id="id_hospital_name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_hospital_address" class="form-label">Hospital Address</label>
+            <textarea name="hospital_address" id="id_hospital_address" class="form-control" rows="2" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_patient_name" class="form-label">Patient Name</label>
+            <input type="text" name="patient_name" id="id_patient_name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_patient_age" class="form-label">Patient Age</label>
+            <input type="number" name="patient_age" id="id_patient_age" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_reason" class="form-label">Reason for Request</label>
+            <textarea name="reason" id="id_reason" class="form-control" rows="3" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_urgency" class="form-label">Urgency</label>
+            <select name="urgency" id="id_urgency" class="form-control" required>
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_needed_by" class="form-label">Needed By</label>
+            <input type="datetime-local" name="needed_by" id="id_needed_by" class="form-control" required>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Create Request</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

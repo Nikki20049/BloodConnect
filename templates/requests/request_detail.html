@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Request Details - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="request-detail">
+    <div class="request-header">
+        <h1>Blood Request Details</h1>
+        <div class="request-status status-{{ blood_request.status }}">
+            {{ blood_request.get_status_display }}
+        </div>
+    </div>
+    
+    <div class="request-card">
+        <div class="request-info">
+            <div class="request-primary">
+                <div class="blood-group-large">{{ blood_request.blood_group }}</div>
+                <div class="request-details">
+                    <h2>{{ blood_request.hospital_name }}</h2>
+                    <p class="hospital-address">{{ blood_request.hospital_address }}</p>
+                    <div class="request-meta">
+                        <span class="urgency-badge urgency-{{ blood_request.urgency }}">
+                            {{ blood_request.get_urgency_display }} Urgency
+                        </span>
+                        <span class="units-needed">{{ blood_request.units_needed }} unit(s) needed</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-secondary">
+                <div class="info-group">
+                    <label>Patient:</label>
+                    <span>{{ blood_request.patient_name }}, {{ blood_request.patient_age }} years</span>
+                </div>
+                <div class="info-group">
+                    <label>Reason:</label>
+                    <span>{{ blood_request.reason }}</span>
+                </div>
+                <div class="info-group">
+                    <label>Requested by:</label>
+                    <span>{{ blood_request.requester.username }}</span>
+                </div>
+                <div class="info-group">
+                    <label>Created:</label>
+                    <span>{{ blood_request.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="info-group">
+                    <label>Needed by:</label>
+                    <span>{{ blood_request.needed_by|date:"M d, Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="request-actions">
+            {% if user.is_authenticated %}
+                {% if user.user_type == 'donor' and blood_request.status == 'pending' %}
+                    {% if user.donor_profile.can_donate and user.donor_profile.blood_group == blood_request.blood_group %}
+                        <a href="{% url 'record_donation_for_request' blood_request.id %}" class="btn-primary">Donate for this Request</a>
+                    {% endif %}
+                {% endif %}
+                
+                {% if user == blood_request.requester or user.user_type in 'admin,ngo' %}
+                    {% if blood_request.status == 'pending' %}
+                        <form method="post" action="{% url 'update_request_status' blood_request.id %}" id="status-update-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="id_status">Update Status:</label>
+                                <select name="status" id="id_status" class="form-control" data-original-value="{{ blood_request.status }}">
+                                    <option value="pending" {% if blood_request.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="fulfilled" {% if blood_request.status == 'fulfilled' %}selected{% endif %}>Fulfilled</option>
+                                    <option value="cancelled" {% if blood_request.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </div>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary">Login to Donate</a>
+            {% endif %}
+            
+            <a href="{% url 'search_requests' %}" class="btn-secondary">Back to Requests</a>
+        </div>
+    </div>
+    
+    <div class="donations-section">
+        <h2>Donations for this Request</h2>
+        {% if donations %}
+            <div class="donation-list">
+                {% for donation in donations %}
+                    <div class="donation-item">
+                        <div class="donor-info">
+                            <div class="donor-avatar">
+                                {% if donation.donor.profile_picture %}
+                                    <img src="{{ donation.donor.profile_picture.url }}" alt="{{ donation.donor.username }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ donation.donor.username|first|upper }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="donor-details">
+                                <h3>{{ donation.donor.get_full_name|default:donation.donor.username }}</h3>
+                                <p>Donated {{ donation.units }} unit(s) at {{ donation.hospital }}</p>
+                                <p class="donation-date">{{ donation.donation_date|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="donation-status">
+                            {% if donation.verification_date %}
+                                <span class="verification-badge">Verified</span>
+                            {% else %}
+                                <span class="verification-badge verification-pending">Pending Verification</span>
+                                {% if user.user_type in 'admin,ngo' %}
+                                    <a href="{% url 'verify_donation' donation.id %}" class="btn-text verify-donation-btn">Verify</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-results">No donations have been made for this request yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="comments-section">
+        <h2>Comments</h2>
+        {% if comments %}
+            <div class="comment-list">
+                {% for comment in comments %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-author">{{ comment.user.get_full_name|default:comment.user.username }}</div>
+                            <div class="comment-time">{{ comment.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                        <div class="comment-content">{{ comment.content }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-results">No comments yet.</p>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+            <div class="comment-form">
+                <h3>Add a Comment</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="content" id="id_content" class="form-control" rows="2" placeholder="Write a comment..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Post Comment</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <p class="login-to-comment">
+                <a href="{% url 'login' %}?next={{ request.path }}">Login to add a comment</a>
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

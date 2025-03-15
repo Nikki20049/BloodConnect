@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="notifications-page">
+    <div class="notifications-header">
+        <h1>Your Notifications</h1>
+        <div class="notifications-actions">
+            <a href="{% url 'mark_all_as_read' %}" class="btn-secondary">Mark All as Read</a>
+        </div>
+    </div>
+    
+    {% if notifications %}
+        <div class="notification-list">
+            {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <div class="notification-title">{{ notification.title }}</div>
+                            <div class="notification-time">{{ notification.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                        <div class="notification-message">{{ notification.message }}</div>
+                        <div class="notification-actions">
+                            {% if notification.related_request %}
+                                <a href="{% url 'view_request' notification.related_request.id %}" class="btn-text">View Request</a>
+                            {% endif %}
+                            {% if notification.related_donation %}
+                                <a href="{% url 'donation_detail' notification.related_donation.id %}" class="btn-text">View Donation</a>
+                            {% endif %}
+                            <a href="{% url 'delete_notification' notification.id %}" class="btn-text text-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-notifications">
+            <div class="no-notifications-icon">🔔</div>
+            <h2>No Notifications</h2>
+            <p>You don't have any notifications at the moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

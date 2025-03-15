@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Create an Account</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_username" class="form-label">Username</label>
+            <input type="text" name="username" id="id_username" class="form-control" required>
+            <div class="form-help">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_email" class="form-label">Email</label>
+            <input type="email" name="email" id="id_email" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_first_name" class="form-label">First Name</label>
+            <input type="text" name="first_name" id="id_first_name" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_last_name" class="form-label">Last Name</label>
+            <input type="text" name="last_name" id="id_last_name" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_user_type" class="form-label">Account Type</label>
+            <select name="user_type" id="id_user_type" class="form-control" required>
+                <option value="regular">Regular User</option>
+                <option value="donor">Blood Donor</option>
+            </select>
+            <div class="form-help">Select "Blood Donor" if you want to register as a donor.</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_password1" class="form-label">Password</label>
+            <input type="password" name="password1" id="id_password1" class="form-control" required>
+            <div class="form-help">
+                <ul>
+                    <li>Your password can't be too similar to your other personal information.</li>
+                    <li>Your password must contain at least 8 characters.</li>
+                    <li>Your password can't be a commonly used password.</li>
+                    <li>Your password can't be entirely numeric.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_password2" class="form-label">Confirm Password</label>
+            <input type="password" name="password2" id="id_password2" class="form-control" required>
+            <div class="form-help">Enter the same password as before, for verification.</div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Register</button>
+        </div>
+    </form>
+    
+    <div class="form-footer">
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+</div>
+{% endblock %}

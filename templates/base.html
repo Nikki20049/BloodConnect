@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blood Donation System{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <a href="{% url 'home' %}">
+                    <h1>BloodConnect</h1>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'search_requests' %}">Find Requests</a></li>
+                    <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+                    {% if user.is_authenticated %}
+                        {% if user.user_type == 'donor' %}
+                            <li><a href="{% url 'donor_dashboard' %}">Donor Dashboard</a></li>
+                        {% endif %}
+                        {% if user.user_type in 'admin,ngo' %}
+                            <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                        {% endif %}
+                        <li class="notification-icon">
+                            <a href="{% url 'notifications' %}">
+                                <span class="icon">🔔</span>
+                                <span class="notification-count" id="notification-count">0</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle">
+                                {{ user.username }} <span class="caret">▼</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'user_profile' %}">My Profile</a></li>
+                                <li><form action="{% url 'logout' %}" method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+</li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}" class="btn-primary">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BloodConnect</h3>
+                    <p>Connecting blood donors with those in need.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'search_requests' %}">Find Requests</a></li>
+                        <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'user_profile' %}">My Profile</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: info@bloodconnect.org</p>
+                    <p>Phone: +1-234-567-8900</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} BloodConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Fetch notification count
+        function updateNotificationCount() {
+            if (document.getElementById('notification-count')) {
+                fetch('{% url "notification_count" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const count = document.getElementById('notification-count');
+                        count.textContent = data.count;
+                        if (data.count > 0) {
+                            count.classList.add('has-notifications');
+                        } else {
+                            count.classList.remove('has-notifications');
+                        }
+                    });
+            }
+        }
+
+        // Update notification count every 30 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCount();
+            setInterval(updateNotificationCount, 30000);
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Blood Requests - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <h1>Search Blood Requests</h1>
+    
+    <div class="search-filters">
+        <form method="get" id="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="q">Search:</label>
+                    <input type="text" name="q" id="q" value="{{ query }}" placeholder="Hospital, location, etc." class="form-control">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="blood_group">Blood Group:</label>
+                    <select name="blood_group" id="blood_group" class="form-control">
+                        <option value="">All Blood Groups</option>
+                        {% for bg in blood_groups %}
+                            <option value="{{ bg.name }}" {% if selected_blood_group == bg.name %}selected{% endif %}>{{ bg.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="urgency">Urgency:</label>
+                    <select name="urgency" id="urgency" class="form-control">
+                        <option value="">All Urgency Levels</option>
+                        <option value="low" {% if selected_urgency == 'low' %}selected{% endif %}>Low</option>
+                        <option value="medium" {% if selected_urgency == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="high" {% if selected_urgency == 'high' %}selected{% endif %}>High</option>
+                        <option value="critical" {% if selected_urgency == 'critical' %}selected{% endif %}>Critical</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="fulfilled" {% if selected_status == 'fulfilled' %}selected{% endif %}>Fulfilled</option>
+                        <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Expired</option>
+                        <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="" {% if selected_status == '' %}selected{% endif %}>All Statuses</option>
+                    </select>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn-primary">Search</button>
+                    <a href="{% url 'search_requests' %}" class="btn-secondary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="search-results">
+        <h2>Results</h2>
+        
+        {% if requests %}
+            <div class="request-list">
+                {% for request in requests %}
+                    <div class="request-item urgency-{{ request.urgency }} status-{{ request.status }}">
+                        <div class="request-details">
+                            <div class="request-header">
+                                <span class="blood-group">{{ request.blood_group }}</span>
+                                <span class="urgency-badge">{{ request.get_urgency_display }}</span>
+                                <span class="status-badge">{{ request.get_status_display }}</span>
+                            </div>
+                            <h3>{{ request.hospital_name }}</h3>
+                            <p>{{ request.hospital_address }}</p>
+                            <p>Units needed: {{ request.units_needed }}</p>
+                            <p>Needed by: {{ request.needed_by|date:"M d, Y H:i" }}</p>
+                            <p>Created: {{ request.created_at|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="request-actions">
+                            <a href="{% url 'view_request' request.id %}" class="btn-secondary">View Details</a>
+                            {% if user.is_authenticated and user.user_type == 'donor' and request.status == 'pending' %}
+                                {% if user.donor_profile.can_donate and user.donor_profile.blood_group == request.blood_group %}
+                                    <a href="{% url 'record_donation_for_request' request.id %}" class="btn-primary">Donate</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-results">No blood requests found matching your criteria.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

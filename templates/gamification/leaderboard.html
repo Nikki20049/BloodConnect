@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Leaderboard - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="leaderboard-page">
+    <h1>Top Blood Donors</h1>
+    <p class="leaderboard-description">Recognizing our most active donors who are saving lives through their contributions.</p>
+    
+    {% if top_donors %}
+        <div class="leaderboard">
+            <div class="leaderboard-header">
+                <div class="rank-header">Rank</div>
+                <div class="donor-header">Donor</div>
+                <div class="donations-header">Donations</div>
+                <div class="badges-header">Badges</div>
+            </div>
+            
+            {% for donor in top_donors %}
+                <div class="leaderboard-item {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %}">
+                    <div class="donor-rank">{{ forloop.counter }}</div>
+                    <div class="donor-info">
+                        <div class="donor-avatar">
+                            {% if donor.profile_picture %}
+                                <img src="{{ donor.profile_picture.url }}" alt="{{ donor.username }}">
+                            {% else %}
+                                <div class="avatar-placeholder">{{ donor.username|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="donor-name">{{ donor.get_full_name|default:donor.username }}</div>
+                    </div>
+                    <div class="donor-donations">{{ donor.verified_donations }}</div>
+                    <div class="donor-badges">
+                        {% if donor.badges.exists %}
+                            {% for user_badge in donor.badges.all|slice:":3" %}
+                                <span class="badge-icon" title="{{ user_badge.badge.name }}">🏅</span>
+                            {% endfor %}
+                            {% if donor.badges.count > 3 %}
+                                <span class="badge-more">+{{ donor.badges.count|add:"-3" }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="no-badges">-</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No donors have made verified donations yet.</p>
+    {% endif %}
+    
+    <div class="leaderboard-info">
+        <h2>How to Climb the Leaderboard</h2>
+        <ul>
+            <li>Donate blood regularly (at least once every 3 months)</li>
+            <li>Make sure your donations are verified by an admin or NGO</li>
+            <li>Respond to urgent blood requests</li>
+            <li>Earn badges for your contributions</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
