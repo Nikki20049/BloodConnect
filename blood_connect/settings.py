@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -36,6 +36,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'blood_connect.urls'
@@ -59,20 +60,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'blood_connect.wsgi.application'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 import dj_database_url
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default='postgresql://neondb_owner:npg_EoeVT6jLlz8N@ep-green-thunder-abz6bosl-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require',
-#         conn_max_age=600,  # Keeps the database connection open for better performance
-#     )
-# }
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgresql://neondb_owner:npg_EoeVT6jLlz8N@ep-green-thunder-abz6bosl-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require',
+        conn_max_age=600,  # Keeps the database connection open for better performance
+    )
+}
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -99,9 +101,13 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = '/media/'
