@@ -1,252 +1,213 @@
-{% extends 'base.html' %}
-
-{% block title %}My Profile - Blood Donation System{% endblock %}
-
-{% block content %}
-<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">Profile Information</h3>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <div class="avatar-circle mx-auto">
-                        <span class="initials">{{ user.username|slice:":1"|upper }}</span>
-                    </div>
-                    <h4 class="mt-3">{{ user.get_full_name }}</h4>
-                    <p class="text-muted">@{{ user.username }}</p>
-                </div>
-                
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Email:</strong>
-                        <span>{{ user.email }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Account Type:</strong>
-                        <span>{% if user.is_donor %}Donor{% else %}Recipient{% endif %}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Joined:</strong>
-                        <span>{{ user.date_joined|date:"F j, Y" }}</span>
-                    </li>
-                </ul>
-                
-                <div class="mt-3">
-                
-                </div>
-            </div>
-        </div>
-        
-        {% if user.is_donor and user.donor_profile %}
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">Donor Information</h3>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Blood Group:</strong>
-                        <span class="badge bg-danger">{{ user.donor_profile.blood_group }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Age:</strong>
-                        <span>{{ user.donor_profile.age }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Weight:</strong>
-                        <span>{{ user.donor_profile.weight }} kg</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Last Donation:</strong>
-                        <span>{% if user.donor_profile.last_donation_date %}{{ user.donor_profile.last_donation_date|date:"F j, Y" }}{% else %}Never{% endif %}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Total Donations:</strong>
-                        <span>{{ donation_count }}</span>
-                    </li>
-                </ul>
-                
-                <div class="mt-3">
-                    <a href="{% url 'complete_donor_profile' %}" class="btn btn-outline-danger w-100">Update Donor Info</a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-8">
-        {% if user.is_donor %}
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">My Donation History</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Location</th>
-                                <th>Units</th>
-                                <th>Points Earned</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for donation in donations %}
-                            <tr>
-                                <td>{{ donation.donation_date|date:"F j, Y" }}</td>
-                                <td>{{ donation.donation_center }}</td>
-                                <td>{{ donation.units }}</td>
-                                <td>{{ donation.points }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No donations recorded yet.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="text-center mt-3">
-                    <a href="{% url 'record_donation' %}" class="btn btn-danger">Record New Donation</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">My Achievements</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {% for badge in badges %}
-                    <div class="col-md-4 text-center mb-4">
-                        <div class="badge-icon mx-auto mb-2">
-                            <i class="{{ badge.icon }} fa-3x text-danger"></i>
-                        </div>
-                        <h5>{{ badge.name }}</h5>
-                        <p class="text-muted small">{{ badge.description }}</p>
-                    </div>
-                    {% empty %}
-                    <div class="col-12 text-center">
-                        <p>No achievements yet. Start donating to earn badges!</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">My Blood Requests</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Blood Group</th>
-                                <th>Units</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for request in blood_requests %}
-                            <tr>
-                                <td>{{ request.created_at|date:"F j, Y" }}</td>
-                                <td>{{ request.blood_group }}</td>
-                                <td>{{ request.units_required }}</td>
-                                <td>
-                                    {% if request.is_fulfilled %}
-                                    <span class="badge bg-success">Fulfilled</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">Pending</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'request_detail' request.id %}" class="btn btn-sm btn-outline-danger">View</a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center">No blood requests made yet.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="text-center mt-3">
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <div class="card">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">Recent Notifications</h3>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    {% for notification in notifications %}
-                    <div class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{ notification.title }}</h5>
-                            <small>{{ notification.created_at|timesince }} ago</small>
-                        </div>
-                        <p class="mb-1">{{ notification.message }}</p>
-                        {% if notification.link %}
-                        <small><a href="{{ notification.link }}">View details</a></small>
-                        {% endif %}
-                    </div>
-                    {% empty %}
-                    <p class="text-center">No recent notifications.</p>
-                    {% endfor %}
-                </div>
-                
-                <div class="text-center mt-3">
-                    <a href="{% url 'notifications' %}" class="btn btn-outline-danger">View All Notifications</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% extends "base.html" %}
+{% load static %}
 
 {% block extra_css %}
 <style>
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-        background-color: #dc3545;
-        text-align: center;
-        border-radius: 50%;
-        -webkit-border-radius: 50%;
-        -moz-border-radius: 50%;
+    .profile-container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+        background: var(--card-color);
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    .initials {
-        position: relative;
-        top: 25px;
-        font-size: 50px;
-        line-height: 50px;
-        color: #fff;
-        font-weight: bold;
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
     }
-    
-    .badge-icon {
-        width: 80px;
-        height: 80px;
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        background-color: #f8f9fa;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+        background-color: var(--primary-light);
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profile-content h3 {
+        margin-bottom: 5px;
+        color: var(--text-color);
+    }
+
+    .profile-content p {
+        color: var(--text-light);
+    }
+
+    .profile-actions {
+        margin-top: 15px;
+    }
+
+    /* Layout for Donors: Two-Column Panel */
+    .donor-layout {
+        display: flex;
+        gap: 20px;
+    }
+
+    .left-panel, .right-panel {
+        flex: 1;
+        padding: 15px;
+        background: var(--background-color);
+        border-radius: 8px;
+    }
+
+    .right-panel {
+        background: var(--card-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    ul li {
+        padding: 5px 0;
+        color: var(--text-color);
+    }
+
+    .btn-secondary {
+        display: inline-block;
+        margin-top: 10px;
+        background: var(--secondary-color);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .btn-secondary:hover {
+        background: var(--secondary-dark);
+    }
+
+    /* Center Content for Normal Users */
+    .center-content {
+        text-align: center;
+        padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .donor-layout {
+            flex-direction: column;
+        }
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header (Image or First Letter) -->
+    <div class="profile-header">
+        {% if profile_user.profile_picture %}
+            <div class="profile-avatar">
+                <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture">
+            </div>
+        {% else %}
+            <div class="profile-avatar">{{ profile_user.username.0|upper }}</div>
+        {% endif %}
+
+        <div class="profile-content">
+            <h3>{{ profile_user.username }}</h3>
+            <p>Email: {{ profile_user.email }}</p>
+            <p>Phone: {{ profile_user.phone_number|default:"Not provided" }}</p>
+            <p>Address: {{ profile_user.address|default:"Not provided" }}</p>
+            <p>Account Type: {{ profile_user.get_user_type_display }}</p>
+
+            {% if request.user == profile_user %}
+                <a href="{% url 'update_profile' %}" class="btn btn-primary">Update Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Normal User Layout -->
+    {% if profile_user.user_type == 'regular' %}
+        <div class="center-content">
+            <a href="{% url 'my_requests' %}" class="btn btn-info">My Requests</a>
+            <a href="{% url 'notifications' %}" class="btn btn-warning">View Notifications</a>
+        </div>
+    {% endif %}
+
+    <!-- Donor User Layout -->
+    {% if profile_user.user_type == 'donor' and donor_profile %}
+        <div class="donor-layout">
+            <!-- Left Panel: User Details -->
+            <div class="left-panel">
+                <h4 class="section-title">Donor Details</h4>
+                <p><strong>Blood Group:</strong> {{ donor_profile.blood_group }}</p>
+                <p><strong>Weight:</strong> {{ donor_profile.weight|default:"Not provided" }} kg</p>
+                <p><strong>Medical Conditions:</strong> {{ donor_profile.medical_conditions|default:"None" }}</p>
+                <p><strong>Availability:</strong> 
+                    {% if donor_profile.is_available %}
+                        <span class="text-success">Available for donation</span>
+                    {% else %}
+                        <span class="text-danger">Not available for donation</span>
+                    {% endif %}
+                </p>
+                <p><strong>Last Donation Date:</strong> {{ donor_profile.last_donation_date|default:"Never donated" }}</p>
+                <p><strong>Total Donations:</strong> {{ donor_profile.total_donations }}</p>
+            </div>
+
+            <!-- Right Panel: Badges & Donations -->
+            <div class="right-panel">
+                <!-- Recent Badges -->
+                <h4 class="section-title">Badges Earned</h4>
+                <ul>
+                    {% for badge in recent_badges %}
+                        <li>{{ badge.badge.name }} - Awarded on {{ badge.awarded_at }}</li>
+                    {% empty %}
+                        <p>No recent badges</p>
+                    {% endfor %}
+                </ul>
+                {% if badge_count > 3 %}
+                    <a href="{% url 'user_badges' profile_user.username %}" class="btn-secondary">View All Badges</a>
+                {% endif %}
+
+                <hr>
+
+                <!-- Recent Donations -->
+                <h4 class="section-title">Recent Donations</h4>
+                <ul>
+                    {% for donation in recent_donations %}
+                        <li>Donated {{ donation.quantity }} units on {{ donation.created_at }}</li>
+                    {% empty %}
+                        <p>No recent donations</p>
+                    {% endfor %}
+                </ul>
+                {% if donation_count > 3 %}
+                    <a href="{% url 'view_donations' profile_user.username %}" class="btn-secondary">View All Donations</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

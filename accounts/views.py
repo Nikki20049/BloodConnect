@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import User, DonorProfile
 from .forms import UserRegistrationForm, UserProfileForm, DonorProfileForm
+from django.shortcuts import render, get_object_or_404
+from gamification.models import UserBadge, Badge
+from .models import User
 
 def register(request):
     if request.method == 'POST':
@@ -30,33 +33,61 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+
 @login_required
-def user_profile(request):
-    if request.method == 'POST':
-        user_form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-        if user_form.is_valid():
-            user_form.save()
-            messages.success(request, 'Your profile has been updated!')
-            return redirect('user_profile')
-    else:
-        user_form = UserProfileForm(instance=request.user)
-    
-    if request.user.user_type == 'donor':
-        try:
-            donor_profile = request.user.donor_profile
-        except DonorProfile.DoesNotExist:
-            donor_profile = None
-        
-        context = {
-            'user_form': user_form,
+def profile_view(request, username):
+    user = get_object_or_404(User, username=username)
+
+    context = {
+        'profile_user': user,
+    }
+
+    if user.user_type == 'donor':
+        donor_profile = getattr(user, 'donor_profile', None)
+        recent_badges = UserBadge.objects.filter(user=user).order_by('-awarded_at')[:3]  # FIXED FIELD NAME
+        badge_count = UserBadge.objects.filter(user=user).count()
+        # recent_donations = Donation.objects.filter(donor_user=user).order_by('-created_at')[:3]
+        # donation_count = Donation.objects.filter(donor_user=user).count()
+
+        context.update({
             'donor_profile': donor_profile,
-        }
-        return render(request, 'accounts/donor_profile.html', context)
+            'recent_badges': recent_badges,
+            'badge_count': badge_count,
+            # 'recent_donations': recent_donations,
+            # 'donation_count': donation_count,
+        })
+
+    return render(request, 'accounts/user_profile.html', context)
+
+@login_required
+def update_profile(request):
+    user = request.user
+
+    if request.method == 'POST':
+        user_form = UserProfileForm(request.POST, request.FILES, instance=user)
+
+        if user.user_type == 'donor':
+            donor_form = DonorProfileForm(request.POST, instance=user.donor_profile)
+
+        if user_form.is_valid() and (user.user_type != 'donor' or donor_form.is_valid()):
+            user_form.save()
+            if user.user_type == 'donor':
+                donor_form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('user_profile', username=user.username)
     else:
-        context = {
-            'user_form': user_form,
-        }
-        return render(request, 'accounts/user_profile.html', context)
+        user_form = UserProfileForm(instance=user)
+
+        if user.user_type == 'donor':
+            donor_form = DonorProfileForm(instance=user.donor_profile)
+
+    context = {'user_form': user_form}
+
+    if user.user_type == 'donor':
+        context['donor_form'] = donor_form
+
+    return render(request, 'accounts/update_profile.html', context)
+
 
 @login_required
 def complete_donor_profile(request):

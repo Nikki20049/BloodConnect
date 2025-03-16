@@ -71,18 +71,45 @@ def record_donation(request, request_id=None):
     }
     return render(request, 'donations/record_donation.html', context)
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from .models import Donation
+
 @login_required
 def donation_history(request):
-    if request.user.user_type != 'donor':
-        messages.error(request, 'Only donors can view donation history.')
+    # Admins and NGOs can see all donations, Donors can only see their own
+    if request.user.user_type == 'donor':
+        donations = Donation.objects.filter(donor=request.user).order_by('-donation_date')
+    elif request.user.user_type in ['admin', 'ngo']:
+        donations = Donation.objects.all().order_by('-donation_date')
+
+        # Filtering options
+        search_query = request.GET.get('search', '')
+        status_filter = request.GET.get('status', '')
+
+        if search_query:
+            donations = donations.filter(
+                Q(donor__username__icontains=search_query) |
+                Q(hospital__icontains=search_query)
+            )
+
+        if status_filter:
+            if status_filter == 'verified':
+                donations = donations.filter(verification_date__isnull=False)
+            elif status_filter == 'pending':
+                donations = donations.filter(verification_date__isnull=True)
+
+    else:
+        messages.error(request, 'You do not have permission to view donation history.')
         return redirect('home')
-    
-    donations = Donation.objects.filter(donor=request.user).order_by('-donation_date')
-    
+
     context = {
         'donations': donations,
     }
     return render(request, 'donations/donation_history.html', context)
+
 
 @login_required
 def verify_donation(request, donation_id):

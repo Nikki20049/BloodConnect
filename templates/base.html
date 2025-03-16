@@ -39,7 +39,7 @@
                                 {{ user.username }} <span class="caret">▼</span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="{% url 'user_profile' %}">My Profile</a></li>
+                                <li><a href="{% url 'user_profile' user.username %}">My Profile</a></li>
                                 <li><form action="{% url 'logout' %}" method="post" style="display: inline;">
     {% csrf_token %}
     <button type="submit">Logout</button>
@@ -86,7 +86,7 @@
                         <li><a href="{% url 'search_requests' %}">Find Requests</a></li>
                         <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
                         {% if user.is_authenticated %}
-                            <li><a href="{% url 'user_profile' %}">My Profile</a></li>
+                            <li><a href="{% url 'user_profile' user.username%}">My Profile</a></li>
                         {% endif %}
                     </ul>
                 </div>

@@ -19,18 +19,18 @@ class UserLoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
 
+from django import forms
+from .models import User
+
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'address', 'profile_picture']
-        widgets = {
-            'address': forms.Textarea(attrs={'rows': 3}),
-        }
+        fields = ['email', 'phone_number', 'address', 'profile_picture']
+
+
+from .models import DonorProfile
 
 class DonorProfileForm(forms.ModelForm):
     class Meta:
         model = DonorProfile
-        fields = ['blood_group', 'weight', 'medical_conditions', 'is_available']
-        widgets = {
-            'medical_conditions': forms.Textarea(attrs={'rows': 3}),
-        }
+        fields = ['blood_group', 'weight', 'medical_conditions', 'is_available', 'last_donation_date']

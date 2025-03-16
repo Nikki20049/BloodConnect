@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }}'s Badges{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    /* Default Badge Styling */
+    .badge-item {
+        text-align: center;
+        background-color: var(--card-color);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        border: 2px solid var(--primary-light);
+    }
+
+    /* Unlocked Badges (Fully Visible) */
+    .badge-item.unlocked:hover {
+        transform: scale(1.05);
+        border: 2px solid var(--success-color);
+    }
+
+    /* Locked Badges (Grayed Out & Not Clickable) */
+    .badge-item.locked {
+        opacity: 0.5;
+        border: 2px dashed var(--border-color);
+        cursor: not-allowed;
+    }
+
+    .badge-icon img.grayscale {
+        filter: grayscale(100%);
+    }
+
+    /* Locked Badge Text (Faded) */
+    .locked-text {
+        color: var(--text-light);
+    }
+
+    /* Clickable Badge Link */
+    .badge-link {
+        text-decoration: none;
+        color: var(--text-color);
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="title_button">
+        <h1>{{ profile_user.username }}'s Achievements</h1>
+        <span class="badge-count">Unlocked: {{ unlocked_badge_ids|length }} / {{ total_badges|length }}</span>
+
+    </div>
+
+    {% if total_badges %}
+        <div class="badges-grid">
+           {% for badge in total_badges %}
+    {% if badge.id in unlocked_badge_ids %}
+        <div class="badge-item unlocked">
+            <!-- <a href="{% url 'download_ce -->
+            <!-- rtificate' badge.id %}" class="badge-link"> -->
+                <div class="badge-icon">
+                    <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" width="50">
+                </div>
+                <div class="badge-name">{{ badge.name }}</div>
+            </a>
+        </div>
+    {% else %}
+        <div class="badge-item locked">
+            <div class="badge-icon">
+                <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" width="50" class="grayscale">
+            </div>
+            <div class="badge-name locked-text">{{ badge.name }}</div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+        </div>
+    {% else %}
+        <p class="no-results">No badges available.</p>
+    {% endif %}
+</div>
+{% endblock %}

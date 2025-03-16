@@ -60,6 +60,7 @@ ul {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin:1px;
 }
 
 .btn-primary {
@@ -578,7 +579,7 @@ section h2::after {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 40% 1fr;
     gap: 30px;
 }
 

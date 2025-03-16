@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-container h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .profile-container fieldset {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .profile-container legend {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .profile-container input, .profile-container textarea, .profile-container select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .profile-container button {
+        width: 100%;
+        padding: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+    }
+
+    .profile-container button:hover {
+        background: #218838;
+    }
+
+    .btn-secondary {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        background: #6c757d;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>Update Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- User Profile Form -->
+        <fieldset>
+            <legend>Personal Information</legend>
+            {{ user_form.as_p }}
+        </fieldset>
+
+        <!-- Donor Profile Form (if user is a donor) -->
+        {% if donor_form %}
+        <fieldset>
+            <legend>Donor Information</legend>
+            {{ donor_form.as_p }}
+        </fieldset>
+        {% endif %}
+
+        <button type="submit">Save Changes</button>
+        <a href="{% url 'user_profile' request.user.username %}" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

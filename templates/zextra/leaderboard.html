@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KindNest Leaderboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">KindNest</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Requests</a>
+                <a href="#">Donation</a>
+                <a href="#">Leaderboard</a>
+            </div>
+            <button class="register-btn">Register</button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="leaderboard-header">
+            <h2>Leaderboard for</h2>
+            <select>
+                <option>Today</option>
+                <option>This Week</option>
+                <option>This Month</option>
+            </select>
+        </div>
+
+        <div class="dashboard">
+            <div class="leaderboard-section">
+                <!-- Top Donors -->
+                <div class="top-donors">
+                    <div class="donor-card">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" alt="User">
+                        <span class="username">Username</span>
+                        <div class="donation-count">
+                            <span class="number">20</span>
+                            <span class="label">Donation Count</span>
+                        </div>
+                        <div class="rank">1</div>
+                        <div class="badges">
+                            <span class="badge heart">❤️</span>
+                            <span class="badge shield">🛡️</span>
+                            <span class="badge star">⭐</span>
+                            <span class="badge award">🏆</span>
+                            <span class="badge users">👥</span>
+                            <span class="badge plus">+</span>
+                        </div>
+                    </div>
+
+                    <div class="donor-card">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150" alt="User">
+                        <span class="username">Username</span>
+                        <div class="donation-count">
+                            <span class="number">20</span>
+                            <span class="label">Donation Count</span>
+                        </div>
+                        <div class="rank">2</div>
+                        <div class="badges">
+                            <span class="badge heart">❤️</span>
+                            <span class="badge shield">🛡️</span>
+                            <span class="badge star">⭐</span>
+                            <span class="badge award">🏆</span>
+                            <span class="badge users">👥</span>
+                            <span class="badge plus">+</span>
+                        </div>
+                    </div>
+
+                    <div class="donor-card">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150" alt="User">
+                        <span class="username">Username</span>
+                        <div class="donation-count">
+                            <span class="number">20</span>
+                            <span class="label">Donation Count</span>
+                        </div>
+                        <div class="rank">3</div>
+                        <div class="badges">
+                            <span class="badge heart">❤️</span>
+                            <span class="badge shield">🛡️</span>
+                            <span class="badge star">⭐</span>
+                            <span class="badge award">🏆</span>
+                            <span class="badge users">👥</span>
+                            <span class="badge plus">+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Donors List -->
+                <div class="other-donors">
+                    <h3>Other Donors</h3>
+                    <div class="donor-list">
+                        <div class="donor-row">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50" alt="User">
+                            <span class="username">Username</span>
+                            <span class="count">4</span>
+                            <div class="badges">
+                                <span class="badge heart">❤️</span>
+                                <span class="badge award">🏆</span>
+                            </div>
+                            <span class="points">10</span>
+                            <span class="contact">+1234567890</span>
+                        </div>
+                        <!-- Repeat donor-row 6 more times -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="donation-stats">
+                    <h3>Donation Count</h3>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <span class="number">15,345</span>
+                            <span class="label">Total Donations</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="number">13,576</span>
+                            <span class="label">Total Donors</span>
+                        </div>
+                    </div>
+                    <div class="graph"></div>
+                </div>
+
+                <div class="blood-type">
+                    <h3>Blood Type</h3>
+                    <div class="donut-chart">
+                        <div class="chart-legend">
+                            <div class="legend-item"><span class="color a-pos"></span>A+</div>
+                            <div class="legend-item"><span class="color o-pos"></span>O+</div>
+                            <div class="legend-item"><span class="color b-pos"></span>B+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="climb-section">
+            <h2>How to climb Leaderboard?</h2>
+            <p>Want to see your name at the top? Here's how you can rank higher and make a bigger impact!</p>
+            
+            <div class="steps">
+                <div class="step-card">
+                    <h3>Donate More</h3>
+                    <p>Every donation increases your count and improves your rank.</p>
+                </div>
+                <div class="step-card">
+                    <h3>Support Urgent Cases</h3>
+                    <p>Donating to high-priority requests earns extra points.</p>
+                </div>
+                <div class="step-card">
+                    <h3>Stay Consistent</h3>
+                    <p>Regular donations help maintain your leaderboard position.</p>
+                </div>
+                <div class="step-card">
+                    <h3>Earn Badges</h3>
+                    <p>Unlock special badges for milestones and achievements.</p>
+                </div>
+                <div class="step-card">
+                    <h3>Refer & Inspire</h3>
+                    <p>Encourage others to donate and gain bonus recognition.</p>
+                </div>
+            </div>
+
+            <div class="motto">
+                <h2>" The more lives you touch, the higher you rise! "</h2>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

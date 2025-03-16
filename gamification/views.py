@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import Count, Q
 from accounts.models import User
 from .models import Badge, UserBadge
-
+from django.shortcuts import render, get_object_or_404
 
 
 def leaderboard(request):
@@ -25,12 +25,22 @@ def badges(request):
     }
     return render(request, 'gamification/badges.html', context)
 
+
 def user_badges(request, username):
-    user = User.objects.get(username=username)
-    user_badges = UserBadge.objects.filter(user=user).select_related('badge')
+    user = get_object_or_404(User, username=username)
+
+    # Get unlocked badges (extract only Badge objects)
+    unlocked_badges = Badge.objects.filter(userbadge__user=user)
     
+    # Convert unlocked badges into a list of IDs
+    unlocked_badge_ids = set(unlocked_badges.values_list('id', flat=True))
+
+    # Get all available badges
+    total_badges = Badge.objects.all()
+
     context = {
         'profile_user': user,
-        'user_badges': user_badges,
+        'unlocked_badge_ids': unlocked_badge_ids,  # Pass only badge IDs
+        'total_badges': total_badges,
     }
     return render(request, 'gamification/user_badges.html', context)

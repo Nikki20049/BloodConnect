@@ -49,7 +49,7 @@
                 {% endif %}
             </div>
             <div class="profile-actions">
-                <a href="{% url 'user_profile' %}" class="btn-secondary">View Full Profile</a>
+                <a href="{% url 'user_profile' user.username %}" class="btn-secondary">View Full Profile</a>
             </div>
         </div>
 

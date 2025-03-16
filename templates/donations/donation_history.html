@@ -1,5 +1,101 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+
+    .search-filter-form {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-filter-form input, .search-filter-form select, .search-filter-form button {
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+
+    .donation-list {
+        margin-top: 10px;
+        background-color:inherit;
+        border: none;
+    box-shadow: none;
+    }
+
+    .donation-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .donation-item.verified {
+        border-left-color: var(--success-color);
+    }
+
+    .donation-item.pending {
+        border-left-color: var(--warning-color);
+    }
+
+    .donation-details p {
+        margin: 5px 0;
+    }
+
+    .donation-actions {
+        margin-top: 10px;
+    }
+
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Donation History</h2>
-<p>List of past donations.</p>
+<div class="container">
+    <h2 class="text-center">Donation History</h2>
+
+    {% if request.user.user_type in "admin,ngo" %}
+    <form method="GET" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search by donor or hospital" value="{{ request.GET.search }}">
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="verified" {% if request.GET.status == "verified" %}selected{% endif %}>Verified</option>
+            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    {% endif %}
+
+    {% if donations %}
+        <div class="donation-list">
+            {% for donation in donations %}
+                <div class="donation-item {% if donation.verification_date %}verified{% else %}pending{% endif %}">
+                    <div class="donation-details">
+                        <p><strong>Donor:</strong> {{ donation.donor.username }}</p>
+                        <p><strong>Hospital:</strong> {{ donation.hospital }}</p>
+                        <p><strong>Date:</strong> {{ donation.donation_date|date:"M d, Y" }}</p>
+                        {% if donation.verification_date %}
+                            <p class="text-success"><strong>Status:</strong> Verified on {{ donation.verification_date|date:"M d, Y" }}</p>
+                        {% else %}
+                            <p class="text-warning"><strong>Status:</strong> Pending Verification</p>
+                        {% endif %}
+
+                        <!-- Show "View Request" button if a donation is linked to a blood request -->
+                        {% if donation.blood_request %}
+                        <div class="donation-actions">
+                            <a href="{% url 'view_request' donation.blood_request.id %}" class="btn-secondary">View Request</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results text-center">No donations found.</p>
+    {% endif %}
+</div>
 {% endblock %}
