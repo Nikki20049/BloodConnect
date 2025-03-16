@@ -67,14 +67,12 @@
     .left-panel, .right-panel {
         flex: 1;
         padding: 15px;
-        background: var(--background-color);
-        border-radius: 8px;
-    }
-
-    .right-panel {
         background: var(--card-color);
+        border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
+  
 
     .section-title {
         font-size: 18px;
@@ -118,6 +116,32 @@
         .donor-layout {
             flex-direction: column;
         }
+    }
+
+    
+
+    .left-panel p {
+        font-size: 16px;
+        margin: 12px 0;
+        color: var(--text-color);
+        line-height: 1.6;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .left-panel p strong {
+        color: var(--secondary-dark);
+        font-weight: 600;
+    }
+
+    .text-success {
+        color: var(--success-color);
+        font-weight: bold;
+    }
+
+    .text-danger {
+        color: var(--danger-color);
+        font-weight: bold;
     }
 </style>
 {% endblock %}
@@ -181,32 +205,46 @@
             <div class="right-panel">
                 <!-- Recent Badges -->
                 <h4 class="section-title">Badges Earned</h4>
-                <ul>
-                    {% for badge in recent_badges %}
-                        <li>{{ badge.badge.name }} - Awarded on {{ badge.awarded_at }}</li>
-                    {% empty %}
-                        <p>No recent badges</p>
-                    {% endfor %}
-                </ul>
-                {% if badge_count > 3 %}
-                    <a href="{% url 'user_badges' profile_user.username %}" class="btn-secondary">View All Badges</a>
+            
+                {% if recent_badges %}
+                    <div class="badges-grid">
+                        {% for badge in recent_badges %}
+                            <div class="badge-item" title="{{ badge.badge.name }}">
+                                <img style="height: 30px;width: 30px;" src="{{ badge.badge.icon.url }}"
+                                    alt="{{ badge.badge.name }}" class="badge-icon">
+                                <div class="badge-name">{{ badge.badge.name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+            
+                    {% if badge_count > 3 %}
+                        <div class="card-footer">
+                            <a href="{% url 'user_badges' profile_user.username %}">View All Badges</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="no-results">No recent badges earned.</p>
                 {% endif %}
-
-                <hr>
-
+            
+              
+            
                 <!-- Recent Donations -->
                 <h4 class="section-title">Recent Donations</h4>
                 <ul>
                     {% for donation in recent_donations %}
                         <li>Donated {{ donation.quantity }} units on {{ donation.created_at }}</li>
                     {% empty %}
-                        <p>No recent donations</p>
+                        <p class="no-results">No recent donations</p>
                     {% endfor %}
                 </ul>
+            
                 {% if donation_count > 3 %}
-                    <a href="{% url 'view_donations' profile_user.username %}" class="btn-secondary">View All Donations</a>
+                    <div class="card-footer">
+                        <a href="{% url 'view_donations' profile_user.username %}" >View All Donations</a>
+                    </div>
                 {% endif %}
             </div>
+            
         </div>
     {% endif %}
 </div>

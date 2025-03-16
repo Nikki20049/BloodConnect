@@ -2,6 +2,91 @@
 
 {% block title %}BloodConnect - Connect Donors with Recipients{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Urgent Requests: Display side by side */
+.request-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive Grid */
+    gap: 20px; /* Spacing between cards */
+    justify-content: center;
+    align-items: stretch;
+}
+
+/* Request Card Styling */
+.request-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;  /* ✅ Hide overflowing content */
+    text-overflow: ellipsis; /* ✅ Add ellipsis for overflowing text */
+    white-space: nowrap; /* ✅ Prevent text from wrapping */
+}
+
+/* Prevent text from overflowing inside request body */
+.request-body {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Hover Effect */
+.request-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Blood Group & Urgency Badge Styling */
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Blood Group Styling */
+.blood-group {
+    font-size: 1.2rem;
+    color: #d9534f; /* Red for urgency */
+}
+
+/* Urgency Badge Colors */
+.urgency-badge {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* ✅ Fix: Better visibility for high-critical urgency */
+.urgency-high {
+    background: #f3efef; /* Bright red */
+    color:#000;
+}
+
+.urgency-medium {
+    background: #f3efef; /* Bright red */
+    color:#000;
+}
+
+.urgency-low {
+    background: #f3efef; /* Bright red */
+    color:#000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .request-cards {
+        grid-template-columns: 1fr; /* Stack on smaller screens */
+    }
+}
+</style>
+{% endblock %}
+
+
 {% block content %}
 <section class="hero">
     <div class="hero-content">
@@ -16,7 +101,7 @@
                 {% endif %}
             {% else %}
                 <a href="{% url 'register' %}" class="btn-primary">Register Now</a>
-                <a href="{% url 'login' %}" class="btn-secondary">Login</a>
+                <a href="{% url 'login' %}" class="btn-primary">Login</a>
             {% endif %}
         </div>
     </div>
@@ -47,7 +132,7 @@
     {% if urgent_requests %}
         <div class="request-cards">
             {% for request in urgent_requests %}
-                <div class="request-card urgency-{{ request.urgency }}">
+                <div class="request-card urgency">
                     <div class="request-header">
                         <span class="blood-group">{{ request.blood_group }}</span>
                         <span class="urgency-badge">{{ request.get_urgency_display }}</span>
@@ -108,7 +193,7 @@
     {% if top_donors %}
         <div class="donor-cards">
             {% for donor in top_donors %}
-                <div class="donor-card">
+                <div class="donor-card" onclick>
                     <div class="donor-rank">{{ forloop.counter }}</div>
                     <div class="donor-avatar">
                         {% if donor.profile_picture %}
@@ -118,14 +203,14 @@
                         {% endif %}
                     </div>
                     <div class="donor-name">{{ donor.get_full_name|default:donor.username }}</div>
-                    <div class="donor-donations">{{ donor.donation_count }} donations</div>
-                    {% if donor.badges.exists %}
+                    <div class="donor-donations">{{ donor.donations_count }} donations</div>
+                    <!-- {% if donor.badges.exists %}
                         <div class="donor-badges">
                             {% for user_badge in donor.badges.all|slice:":3" %}
                                 <span class="badge-icon" title="{{ user_badge.badge.name }}">🏅</span>
                             {% endfor %}
                         </div>
-                    {% endif %}
+                    {% endif %} -->
                 </div>
             {% endfor %}
         </div>

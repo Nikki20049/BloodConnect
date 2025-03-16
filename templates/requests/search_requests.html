@@ -2,6 +2,215 @@
 
 {% block title %}Search Blood Requests - BloodConnect{% endblock %}
 
+{% block extra_css %}
+<style>
+    .search-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .search-filters {
+        background: var(--card-color);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: var(--text-color);
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-results {
+        background: var(--card-color);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .request-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Make all request items the same width */
+    .request-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        width: 100%; /* Ensures uniform width */
+        max-width: 800px; /* Prevents items from stretching too wide */
+        margin: 0 auto;
+        cursor:pointer; /* Centers the items */
+    }
+
+    .request-item:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Status Colors for Left Border */
+    .request-item.status-pending {
+        border-left: 5px solid var(--warning-color);
+    }
+
+    .request-item.status-fulfilled {
+        border-left: 5px solid var(--success-color);
+    }
+
+    .request-item.status-expired {
+        border-left: 5px solid var(--text-light);
+    }
+
+    .request-item.status-cancelled {
+        border-left: 5px solid var(--danger-color);
+    }
+
+    /* Styling for Request Header */
+    .request-header {
+        display: flex;
+        gap: 10px;
+        justify-content: start;
+        align-items: center;
+        margin-bottom: 10px;
+        background-color: inherit;
+    }
+
+    /* Blood Group Badge */
+    .blood-group {
+        font-weight: bold;
+        font-size: 14px;
+        padding: 4px 10px;
+        border-radius: 5px;
+        background: var(--primary-light);
+        color: white;
+        text-transform: uppercase;
+    }
+
+    /* Urgency Badge Styling */
+    .urgency-badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        text-transform: capitalize;
+    }
+
+    .urgency-badge.urgency-low {
+        background: var(--info-color);
+    }
+
+    .urgency-badge.urgency-medium {
+        background: var(--warning-color);
+    }
+
+    .urgency-badge.urgency-high {
+        background: var(--danger-color);
+    }
+
+    .urgency-badge.urgency-critical {
+        background: var(--danger-color);
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* Status Badge Styling */
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        text-transform: capitalize;
+    }
+
+    .status-badge.status-pending {
+        background: var(--warning-color);
+    }
+
+    .status-badge.status-fulfilled {
+        background: var(--success-color);
+    }
+
+    .status-badge.status-expired {
+        background: var(--text-light);
+    }
+
+    .status-badge.status-cancelled {
+        background: var(--danger-color);
+    }
+
+    .request-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: var(--text-light);
+    }
+
+    @media (max-width: 768px) {
+        .filter-row {
+            flex-direction: column;
+        }
+
+        .request-item {
+            flex-direction: column;
+            text-align: center;
+            cursor:pointer;
+        }
+
+        .request-actions {
+            flex-direction: row;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="search-page">
     <h1>Search Blood Requests</h1>
@@ -34,21 +243,16 @@
                         <option value="critical" {% if selected_urgency == 'critical' %}selected{% endif %}>Critical</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label for="status">Status:</label>
                     <select name="status" id="status" class="form-control">
-                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All</option>
                         <option value="fulfilled" {% if selected_status == 'fulfilled' %}selected{% endif %}>Fulfilled</option>
+                        <option value="not_fulfilled" {% if selected_status == 'not_fulfilled' %}selected{% endif %}>Not Fulfilled</option>
+                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
                         <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Expired</option>
                         <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                        <option value="" {% if selected_status == '' %}selected{% endif %}>All Statuses</option>
                     </select>
-                </div>
-                
-                <div class="filter-actions">
-                    <button type="submit" class="btn-primary">Search</button>
-                    <a href="{% url 'search_requests' %}" class="btn-secondary">Reset</a>
                 </div>
             </div>
         </form>
@@ -60,26 +264,22 @@
         {% if requests %}
             <div class="request-list">
                 {% for request in requests %}
-                    <div class="request-item urgency-{{ request.urgency }} status-{{ request.status }}">
+                    <div class="request-item status-{{ request.status }}" onclick="location.href='{% url 'view_request' request.id %}'">
                         <div class="request-details">
                             <div class="request-header">
                                 <span class="blood-group">{{ request.blood_group }}</span>
-                                <span class="urgency-badge">{{ request.get_urgency_display }}</span>
-                                <span class="status-badge">{{ request.get_status_display }}</span>
+                                <span class="urgency-badge urgency-{{ request.urgency }}">{{ request.get_urgency_display }}</span>
+                                <span class="status-badge status-{{ request.status }}">{{ request.get_status_display }}</span>
+                                <div class="request-meta">
+                                    <span class="created-at">Created: {{ request.created_at|date:"M d, Y" }}</span>
+                                    <span class="needed-by">Needed by: {{ request.needed_by|date:"M d, Y H:i" }}</span>
+                                </div>
                             </div>
-                            <h3>{{ request.hospital_name }}</h3>
-                            <p>{{ request.hospital_address }}</p>
-                            <p>Units needed: {{ request.units_needed }}</p>
-                            <p>Needed by: {{ request.needed_by|date:"M d, Y H:i" }}</p>
-                            <p>Created: {{ request.created_at|date:"M d, Y" }}</p>
-                        </div>
-                        <div class="request-actions">
-                            <a href="{% url 'view_request' request.id %}" class="btn-secondary">View Details</a>
-                            {% if user.is_authenticated and user.user_type == 'donor' and request.status == 'pending' %}
-                                {% if user.donor_profile.can_donate and user.donor_profile.blood_group == request.blood_group %}
-                                    <a href="{% url 'record_donation_for_request' request.id %}" class="btn-primary">Donate</a>
-                                {% endif %}
-                            {% endif %}
+                            <p><strong>Patient  :</strong> &nbsp;{{ request.patient_name }},{{request.patient_age}} years</p>
+                            <p><strong>Hospital :</strong> &nbsp;{{ request.hospital_name }}</p>
+                            <p><strong>Address  :</strong> &nbsp;{{ request.hospital_address }}</p>
+                            <p><strong>Units  :</strong> &nbsp;{{ request.units_needed }}</p>
+                            
                         </div>
                     </div>
                 {% endfor %}

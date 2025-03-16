@@ -78,6 +78,7 @@
                         <p><strong>Donor:</strong> {{ donation.donor.username }}</p>
                         <p><strong>Hospital:</strong> {{ donation.hospital }}</p>
                         <p><strong>Date:</strong> {{ donation.donation_date|date:"M d, Y" }}</p>
+                        <p><strong>Units:</strong>{{donation.units}}</p>
                         {% if donation.verification_date %}
                             <p class="text-success"><strong>Status:</strong> Verified on {{ donation.verification_date|date:"M d, Y" }}</p>
                         {% else %}
@@ -85,11 +86,12 @@
                         {% endif %}
 
                         <!-- Show "View Request" button if a donation is linked to a blood request -->
-                        {% if donation.blood_request %}
-                        <div class="donation-actions">
-                            <a href="{% url 'view_request' donation.blood_request.id %}" class="btn-secondary">View Request</a>
+                        
+                        <div class="donation-actions">{% if donation.blood_request %} <a href="{% url 'view_request' donation.blood_request.id %}" class="btn-secondary">View Request</a>{% endif %}
+                           
+                            <a href="{% url 'donation_detail' donation.id %}" class="btn-secondary">View Details</a>
                         </div>
-                        {% endif %}
+                        
                     </div>
                 </div>
             {% endfor %}

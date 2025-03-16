@@ -4,90 +4,213 @@
 
 {% block extra_css %}
 <style>
-
+    /* --- Badge Grid Layout --- */
     .badges-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 15px;
         margin-top: 20px;
+        justify-content: center;
     }
 
-    /* Default Badge Styling */
+    /* --- Badge Item Styling --- */
     .badge-item {
         text-align: center;
-        background-color: var(--card-color);
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 12px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         transition: transform 0.3s ease;
-        border: 2px solid var(--primary-light);
+        position: relative;
+        width: 120px; /* Fixed badge width */
+        cursor: pointer;
+        background: white;
     }
 
-    /* Unlocked Badges (Fully Visible) */
-    .badge-item.unlocked:hover {
-        transform: scale(1.05);
+    /* --- Badge Image Styling --- */
+    .badge-icon img {
+        width: 80px; /* Fixed width */
+        height: 80px; /* Fixed height */
+        object-fit: contain;
+    }
+
+    /* --- Unlocked Badges --- */
+    .badge-item.unlocked {
+        background-color: var(--card-color);
         border: 2px solid var(--success-color);
     }
 
-    /* Locked Badges (Grayed Out & Not Clickable) */
+    .badge-item.unlocked:hover {
+        transform: scale(1.05);
+        border-color: var(--primary-light);
+    }
+
+    /* --- Locked Badges --- */
     .badge-item.locked {
-        opacity: 0.5;
+        background-color: rgba(200, 200, 200, 0.2);
         border: 2px dashed var(--border-color);
+        opacity: 0.7;
         cursor: not-allowed;
     }
 
-    .badge-icon img.grayscale {
-        filter: grayscale(100%);
+    .badge-item.locked .badge-icon img {
+        filter: grayscale(100%) blur(1px);
     }
 
-    /* Locked Badge Text (Faded) */
+    /* Locked Badge Symbol */
+    .badge-item.locked::after {
+        content: "🔒";
+        font-size: 20px;
+        color: red;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    /* --- Badge Name Text --- */
+    .badge-name {
+        margin-top: 5px;
+        font-weight: bold;
+    }
+
     .locked-text {
-        color: var(--text-light);
+        color: gray;
     }
 
-    /* Clickable Badge Link */
-    .badge-link {
-        text-decoration: none;
-        color: var(--text-color);
-        display: block;
+    /* --- Modal Background (Overlay) --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+    }
+
+    /* --- Center the Modal Properly --- */
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Perfectly centers it */
+        background: white;
+        width: 50%; /* 50% of screen width */
+        max-width: 500px; /* Limit max width */
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.3);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* --- Close Button (X) --- */
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: black;
+        font-weight: bold;
+    }
+
+    .modal-close:hover {
+        color: red;
+    }
+
+    /* --- Badge Image Inside Modal --- */
+    .modal-content img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
+        object-fit: contain;
+    }
+
+    /* --- Smooth Fade-In Animation --- */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -55%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    /* --- Responsive Modal for Small Screens --- */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 80%; /* Set width to 80% for smaller screens */
+            max-width: 350px;
+        }
     }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="container mt-4">
     <div class="title_button">
         <h1>{{ profile_user.username }}'s Achievements</h1>
-        <span class="badge-count">Unlocked: {{ unlocked_badge_ids|length }} / {{ total_badges|length }}</span>
-
+        <span class="badge-count">Unlocked: {{ unlocked_badges|length }} / {{ total_badges|length }}</span>
     </div>
 
     {% if total_badges %}
         <div class="badges-grid">
-           {% for badge in total_badges %}
-    {% if badge.id in unlocked_badge_ids %}
-        <div class="badge-item unlocked">
-            <!-- <a href="{% url 'download_ce -->
-            <!-- rtificate' badge.id %}" class="badge-link"> -->
-                <div class="badge-icon">
-                    <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" width="50">
+            {% for badge in total_badges %}
+                <div class="badge-item {% if badge in unlocked_badges %}unlocked{% else %}locked{% endif %}"
+                     onclick="showBadgeDetails('{{ badge.name }}', '{{ badge.description }}', '{{ badge.icon.url }}', {% if badge in unlocked_badges %}true{% else %}false{% endif %})">
+                    <div class="badge-icon">
+                        <img src="{{ badge.icon.url }}" alt="{{ badge.name }}">
+                    </div>
+                    <div class="badge-name {% if badge not in unlocked_badges %}locked-text{% endif %}">
+                        {{ badge.name }}
+                    </div>
                 </div>
-                <div class="badge-name">{{ badge.name }}</div>
-            </a>
-        </div>
-    {% else %}
-        <div class="badge-item locked">
-            <div class="badge-icon">
-                <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" width="50" class="grayscale">
-            </div>
-            <div class="badge-name locked-text">{{ badge.name }}</div>
-        </div>
-    {% endif %}
-{% endfor %}
-
+            {% endfor %}
         </div>
     {% else %}
         <p class="no-results">No badges available.</p>
     {% endif %}
 </div>
+
+<!-- Badge Details Modal -->
+<div id="badgeModal" class="modal">
+    <span class="modal-close" onclick="closeModal()">✖</span>
+    <div class="modal-content">
+        <img id="modalBadgeImage" src="" alt="Badge Image">
+        <h3 id="modalBadgeTitle"></h3>
+        <p id="modalBadgeDescription"></p>
+    </div>
+</div>
+
+<script>
+    function showBadgeDetails(name, description, imageUrl, isUnlocked) {
+        let modal = document.getElementById("badgeModal");
+        let badgeTitle = document.getElementById("modalBadgeTitle");
+        let badgeDesc = document.getElementById("modalBadgeDescription");
+        let badgeImg = document.getElementById("modalBadgeImage");
+
+        badgeTitle.innerText = name;
+        badgeDesc.innerText = isUnlocked ? description : "This badge is locked. Unlock it by completing the required task.";
+        badgeImg.src = imageUrl;
+
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("badgeModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        let modal = document.getElementById("badgeModal");
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
 {% endblock %}

@@ -105,14 +105,21 @@ def my_requests(request):
     requests = BloodRequest.objects.filter(requester=request.user).order_by('-created_at')
     return render(request, 'requests/my_requests.html', {'requests': requests})
 
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Q
+from .models import BloodRequest, BloodGroup
+
 def search_requests(request):
     query = request.GET.get('q', '')
     blood_group = request.GET.get('blood_group', '')
     urgency = request.GET.get('urgency', '')
-    status = request.GET.get('status', 'pending')
-    
+    status = request.GET.get('status', 'all')
+
+    # Start with all requests
     requests = BloodRequest.objects.all()
-    
+
+    # Apply search query (hospital name, address, patient name, reason)
     if query:
         requests = requests.filter(
             Q(hospital_name__icontains=query) |
@@ -120,23 +127,31 @@ def search_requests(request):
             Q(patient_name__icontains=query) |
             Q(reason__icontains=query)
         )
-    
+
+    # Apply blood group filter
     if blood_group:
-        requests = requests.filter(blood_group__name=blood_group)
-    
+        requests = requests.filter(blood_group=blood_group)
+
+    # Apply urgency filter
     if urgency:
         requests = requests.filter(urgency=urgency)
-    
-    if status:
-        requests = requests.filter(status=status)
-    
-    # Update expired requests
+
+    # Apply status filter
+    if status == 'fulfilled':
+        requests = requests.filter(status='fulfilled')
+    elif status == 'not_fulfilled':
+        requests = requests.exclude(status='fulfilled')
+    elif status == 'pending':
+        requests = requests.filter(status='pending')
+    elif status == 'expired':
+        requests = requests.filter(status='expired')
+    elif status == 'cancelled':
+        requests = requests.filter(status='cancelled')
+
+    # Bulk update expired requests
     now = timezone.now()
-    expired_requests = requests.filter(status='pending', needed_by__lt=now)
-    for req in expired_requests:
-        req.status = 'expired'
-        req.save()
-    
+    BloodRequest.objects.filter(status='pending', needed_by__lt=now).update(status='expired')
+
     context = {
         'requests': requests.order_by('-created_at'),
         'blood_groups': BloodGroup.objects.all(),

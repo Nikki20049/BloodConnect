@@ -38,7 +38,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'blood_donation.urls'
+ROOT_URLCONF = 'blood_connect.urls'
 
 TEMPLATES = [
     {
@@ -56,19 +56,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'blood_donation.wsgi.application'
+WSGI_APPLICATION = 'blood_connect.wsgi.application'
 
-# Database
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'blood_donation_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'your_password',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -76,6 +65,14 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+import dj_database_url
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='postgresql://neondb_owner:npg_EoeVT6jLlz8N@ep-green-thunder-abz6bosl-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require',
+#         conn_max_age=600,  # Keeps the database connection open for better performance
+#     )
+# }
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 

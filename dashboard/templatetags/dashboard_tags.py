@@ -13,3 +13,11 @@ def percentage_of_max(value, max_value):
         return (value / max_value) * 100
     except (ValueError, TypeError):
         return 0  # Return 0 if invalid input
+import datetime
+
+@register.filter
+def add_days(value, days):
+    """Adds the specified number of days to a given date."""
+    if isinstance(value, datetime.date):
+        return value + datetime.timedelta(days=days)
+    return value  # Return as is if value is not a date

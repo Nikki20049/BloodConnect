@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <style>
+        .extra_css {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: var(--card-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .extra_css h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .extra_css p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .extra_css form {
+            margin-top: 15px;
+        }
+
+        .extra_css .btn-primary,
+        .extra_css .btn-danger {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .extra_css .btn-primary {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .extra_css .btn-primary:hover {
+            background-color: darkgreen;
+        }
+
+        .extra_css .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .extra_css .btn-danger:hover {
+            background-color: darkred;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="extra_css">
+        <h2>Donation Details</h2>
+        <p><strong>Donor:</strong> {{ donation.donor.username }}</p>
+        <p><strong>Hospital:</strong> {{ donation.hospital }}</p>
+        <p><strong>Units Donated:</strong> {{ donation.units }}</p>
+        <p><strong>Donation Date:</strong> {{ donation.donation_date }}</p>
+        <p><strong>Verified By:</strong> 
+            {% if donation.verified_by %} 
+                ✅ {{ donation.verified_by.username }} ({{ donation.verification_date|date:"Y-m-d H:i" }}) 
+            {% else %}
+                ❌ Not Verified
+            {% endif %}
+        </p>
+
+        {% if user.user_type == "admin" and not donation.verified_by %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="verify" class="btn-primary">Verify Donation</button>
+            </form>
+        {% endif %}
+
+        {% if user == donation.donor and not donation.verified_by %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="delete" class="btn-danger">Delete Donation</button>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

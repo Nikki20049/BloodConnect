@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% load dashboard_tags %}
+{% load static %}
 
 {% block title %}Admin Dashboard - BloodConnect{% endblock %}
 {% block extra_css %}
+<script src="{% static 'js/chart.js' %}"></script>
+
 <style>
     .donor-avatar {
     width: 50px;
@@ -65,6 +68,10 @@
     gap: 15px;
 }
 
+.donation-list{
+    box-shadow: none;
+    background-color: inherit;
+}
 /* Donor Details */
 .donor-details h3 {
     font-size: 16px;
@@ -124,6 +131,31 @@
         justify-content: space-between;
     }
 }
+
+
+
+
+.dashboard-main.dashboard-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    text-align: center;
+    max-width: 700px;
+    margin: auto;
+}
+
+canvas {
+    width: 90% !important;
+    max-height: 300px;
+}
+
+.no-results {
+    color: #666;
+    font-style: italic;
+}
+
 </style>
 {% endblock %}
 {% block content %}
@@ -227,21 +259,65 @@
     <div class="dashboard-sidebar">
         <div class="dashboard-card">
             <h3>Blood Group Statistics</h3>
+            
             {% if blood_group_stats %}
-                <div class="blood-group-stats">
-                    {% for stat in blood_group_stats %}
-                        <div class="blood-group-stat">
-                            <div class="blood-group">{{ stat.blood_group__name }}</div>
-                            <div class="stat-bar" style="width: {{ stat.count|percentage_of_max:blood_group_stats }}%">
-                                <span class="stat-value">{{ stat.count }}</span>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
+                <canvas id="bloodGroupChart"></canvas>
+                
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var ctx = document.getElementById('bloodGroupChart').getContext('2d');
+        
+                        var bloodGroups = [{% for stat in blood_group_stats %}"{{ stat.blood_group__name }}",{% endfor %}];
+                        var bloodCounts = [{% for stat in blood_group_stats %}{{ stat.count }},{% endfor %}];
+        
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: bloodGroups,
+                                datasets: [{
+                                    label: 'Number of Blood Requests',
+                                    data: bloodCounts,
+                                    backgroundColor: [
+                                        '#FF5733', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
+                                        '#FF6384', '#C9CBCF', '#43AA8B', '#2E86C1', '#D4AC0D'
+                                    ],
+                                    borderColor: '#333',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        ticks: { color: "#333" },
+                                        grid: { color: "rgba(0, 0, 0, 0.1)" }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { stepSize: 1, color: "#333" },
+                                        grid: { color: "rgba(0, 0, 0, 0.1)" }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            color: '#333',
+                                            font: { size: 14 }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                </script>
             {% else %}
                 <p class="no-results">No blood request data available.</p>
             {% endif %}
         </div>
+        
 
         <div class="dashboard-card">
             <h3>Recent Donations</h3>

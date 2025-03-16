@@ -161,17 +161,33 @@ def verify_donation(request, donation_id):
     
     return redirect('admin_dashboard')
 
+
 @login_required
 def donation_detail(request, donation_id):
     donation = get_object_or_404(Donation, id=donation_id)
-    
-    # Check if user has permission to view this donation
+
+    # Permission check: Only admins, NGOs, requesters, or the donor can view
     if request.user != donation.donor and request.user.user_type not in ['admin', 'ngo']:
         if donation.blood_request and request.user != donation.blood_request.requester:
             messages.error(request, 'You do not have permission to view this donation.')
             return redirect('home')
-    
-    context = {
-        'donation': donation,
-    }
+
+    # Admin Verification
+    if request.user.user_type == 'admin' and request.method == 'POST' and 'verify' in request.POST:
+        donation.verified_by = request.user
+        donation.verification_date = timezone.now()
+        donation.save()
+        messages.success(request, 'Donation has been verified successfully.')
+        return redirect('donation_detail', donation_id=donation.id)
+
+    # Donor Deletion (Only if not verified)
+    if request.user == donation.donor and request.method == 'POST' and 'delete' in request.POST:
+        if donation.verified_by:
+            messages.error(request, 'Verified donations cannot be deleted.')
+        else:
+            donation.delete()
+            messages.success(request, 'Donation has been deleted successfully.')
+            return redirect('home')
+
+    context = {'donation': donation}
     return render(request, 'donations/donation_detail.html', context)

@@ -1,62 +1,282 @@
 {% extends 'base.html' %}
 
-{% block title %}Donor Leaderboard - BloodConnect{% endblock %}
+{% block extra_css %}
+<style>
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+        color: #333;
+    }
+
+    /* Leaderboard Header */
+    .leaderboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .leaderboard-header select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    /* Top Donors */
+    .top-donors {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .donor-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+        width: 200px;
+        cursor: pointer;
+    }
+
+    /* .donor-card img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+    } */
+
+    .donation-count {
+        margin: 1rem 0;
+    }
+
+    .donation-count .number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+    }
+
+    .donation-count .label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Leaderboard Table */
+    .leaderboard-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .leaderboard-table th, .leaderboard-table td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .leaderboard-table th {
+        background-color: var(--primary-light);
+        color: white;
+        font-weight: bold;
+    }
+
+    .leaderboard-table tbody tr:hover {
+        background-color: #ffe6eb; /* Light pink hover effect */
+    }
+
+    .leaderboard-table tr:nth-child(even) {
+        background-color: #f8f8f8;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        font-size: 1rem;
+        margin: 0 3px;
+        padding: 4px;
+        border-radius: 5px;
+        background: #f1f1f1;
+        color: #555;
+    }
+
+    .badge.heart {
+        color: red;
+    }
+
+    .badge.shield {
+        color: blue;
+    }
+
+    .badge.star {
+        color: gold;
+    }
+
+    @media (max-width: 768px) {
+        .top-donors {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+    }
+    .badge-container {
+    display: flex;
+    align-items: center;  /* Aligns badges & +X correctly */
+    gap: 5px;  /* Adds space between badges */
+}
+
+.badge-icon {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%; /* Optional: makes badges circular */
+}
+
+.more-badges {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    background: #f1f1f1;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+/* Centering Profile Image or Placeholder */
+.profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px; /* Space below profile */
+}
+
+.profile-pic, .profile-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;  /* Ensures images fit properly */
+}
+
+/* Styling for the First Letter Placeholder */
+.profile-placeholder {
+    background-color: var(--primary-light); /* Circle background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+}
+
+
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="leaderboard-page">
-    <h1>Top Blood Donors</h1>
-    <p class="leaderboard-description">Recognizing our most active donors who are saving lives through their contributions.</p>
+<div class="leaderboard-header">
+    <h2>Leaderboard</h2>
+    <select>
+        <option>Today</option>
+        <option>This Week</option>
+        <option>This Month</option>
+    </select>
+</div>
+
+<!-- Top 3 Donors -->
+<div class="top-donors">
+    {% for donor in top_3_donors %}
+    <div class="donor-card" onclick="location.href='{% url 'user_profile' donor.user.username %}'">
+        <div class="profile-container">
+            {% if donor.user.profile_picture %}
+                <img class="profile-pic" src="{{ donor.user.profile_picture.url }}" alt="{{ donor.user.username }}">
+            {% else %}
+                <div class="profile-placeholder">{{ donor.user.username|first|upper }}</div>
+            {% endif %}
+        </div>
     
-    {% if top_donors %}
-        <div class="leaderboard">
-            <div class="leaderboard-header">
-                <div class="rank-header">Rank</div>
-                <div class="donor-header">Donor</div>
-                <div class="donations-header">Donations</div>
-                <div class="badges-header">Badges</div>
+        <span class="username">{{ donor.user.username }}</span>
+    
+        <div class="donation-count">
+            <span class="number">#{{ forloop.counter }}</span>
+            <span class="label">Donation Count <br>{{ donor.user.total_verified_donations }}</span>
+        </div>
+    
+        
+            <div class="badge-container">
+                {% for badge in donor.badges|slice:":3" %}
+                    <img  class="badge-icon" src="{{ badge.icon.url }}" alt="{{ badge.name }}">
+                {% empty %}
+                <p>No Badges</p>
+                {% endfor %}
+            
+                {% if donor.badges|length > 3 %}
+                    <span class="more-badges">+{{ donor.badges|length|add:"-3" }}</span>
+                {% endif %}
             </div>
             
-            {% for donor in top_donors %}
-                <div class="leaderboard-item {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %}">
-                    <div class="donor-rank">{{ forloop.counter }}</div>
-                    <div class="donor-info">
-                        <div class="donor-avatar">
-                            {% if donor.profile_picture %}
-                                <img src="{{ donor.profile_picture.url }}" alt="{{ donor.username }}">
-                            {% else %}
-                                <div class="avatar-placeholder">{{ donor.username|first|upper }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="donor-name">{{ donor.get_full_name|default:donor.username }}</div>
-                    </div>
-                    <div class="donor-donations">{{ donor.verified_donations }}</div>
-                    <div class="donor-badges">
-                        {% if donor.badges.exists %}
-                            {% for user_badge in donor.badges.all|slice:":3" %}
-                                <span class="badge-icon" title="{{ user_badge.badge.name }}">🏅</span>
-                            {% endfor %}
-                            {% if donor.badges.count > 3 %}
-                                <span class="badge-more">+{{ donor.badges.count|add:"-3" }}</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="no-badges">-</span>
+        
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Full Leaderboard Table -->
+<div class="leaderboard-container">
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Donation Count</th>
+                <th>Badges</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donor in all_donors %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ donor.user.username }}</td>
+                <td>{{ donor.user.total_verified_donations }}</td>
+                <td>
+                    <div class="badge-container">
+                        {% for badge in donor.badges|slice:":3" %}
+                            <img class="badge-icon" src="{{ badge.icon.url }}" alt="{{ badge.name }}">
+                        {% empty %}
+                        <p>No Badges</p>
+                        {% endfor %}
+                    
+                        {% if donor.badges|length > 3 %}
+                            <span class="more-badges">+{{ donor.badges|length|add:"-3" }}</span>
                         {% endif %}
                     </div>
-                </div>
+                    
+                </td>
+            </tr>
             {% endfor %}
-        </div>
-    {% else %}
-        <p class="no-results">No donors have made verified donations yet.</p>
-    {% endif %}
-    
-    <div class="leaderboard-info">
-        <h2>How to Climb the Leaderboard</h2>
-        <ul>
-            <li>Donate blood regularly (at least once every 3 months)</li>
-            <li>Make sure your donations are verified by an admin or NGO</li>
-            <li>Respond to urgent blood requests</li>
-            <li>Earn badges for your contributions</li>
-        </ul>
-    </div>
+        </tbody>
+    </table>
 </div>
 {% endblock %}

@@ -1,4 +1,6 @@
 /* Base Styles */
+
+
 :root {
     --primary-color: #e53935;
     --primary-dark: #c62828;
@@ -118,7 +120,7 @@ ul {
     font-weight: 700;
     color: var(--primary-color);
 }
-
+ 
 .main-nav ul {
     display: flex;
     align-items: center;
@@ -212,7 +214,7 @@ ul {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/images/hero-bg.jpg');
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/media/images/image.png');
     background-size: cover;
     background-position: center;
     color: white;
@@ -312,165 +314,265 @@ section h2::after {
 }
 
 /* Request Cards */
-.request-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+/* */
+
+/* General Page Styling */
+.request-detail {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.request-card {
-    background-color: var(--card-color);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    border-top: 4px solid var(--info-color);
-}
-
-.request-card:hover {
-    transform: translateY(-5px);
-}
-
-.request-card.urgency-low {
-    border-top-color: var(--info-color);
-}
-
-.request-card.urgency-medium {
-    border-top-color: var(--warning-color);
-}
-
-.request-card.urgency-high {
-    border-top-color: var(--danger-color);
-}
-
-.request-card.urgency-critical {
-    border-top-color: var(--danger-color);
-    background-color: #fff8f8;
-}
-
+/* Header Styling */
 .request-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background-color: rgba(0, 0, 0, 0.02);
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
 
-.blood-group {
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--primary-color);
+.request-header h1 {
+    font-size: 24px;
+    color: #d32f2f;
+    margin: 0;
+}
+
+.request-status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.status-pending {
+    background: #ffcc00;
+    color: #333;
+}
+
+.status-fulfilled {
+    background: #4caf50;
+    color: white;
+}
+
+.status-cancelled {
+    background: #f44336;
+    color: white;
+}
+
+/* Request Card */
+.request-card {
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.request-primary {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.blood-group-large {
+    font-size: 28px;
+    font-weight: bold;
+    color: #d32f2f;
+    border: 3px solid #d32f2f;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.request-details h2 {
+    margin: 0;
+    color: #333;
+}
+
+.hospital-address {
+    font-size: 14px;
+    color: #666;
+}
+
+.request-meta {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
 }
 
 .urgency-badge {
     padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    background-color: var(--info-color);
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.urgency-high {
+    background: #d32f2f;
     color: white;
 }
 
-.urgency-badge.urgency-low {
-    background-color: var(--info-color);
+.urgency-medium {
+    background: #ff9800;
+    color: white;
 }
 
-.urgency-badge.urgency-medium {
-    background-color: var(--warning-color);
+.urgency-low {
+    background: #4caf50;
+    color: white;
 }
 
-.urgency-badge.urgency-high {
-    background-color: var(--danger-color);
+/* Request Secondary Details */
+.request-secondary {
+    margin-top: 15px;
 }
 
-.urgency-badge.urgency-critical {
-    background-color: var(--danger-color);
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
 }
 
-.request-body {
-    padding: 15px;
+.info-group label {
+    font-weight: bold;
+    color: #555;
 }
 
-.request-body h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
+/* Buttons */
+
+
+
+
+/* Donations Section */
+.donations-section {
+    margin-top: 20px;
 }
 
-.request-body p {
-    margin-bottom: 5px;
-    color: var(--text-light);
-}
-
-.request-footer {
-    padding: 15px;
-    border-top: 1px solid var(--border-color);
-    text-align: right;
-}
-
-/* Donation List */
 .donation-list {
-    background-color: var(--card-color);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
 }
 
 .donation-item {
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-}
-
-.donation-item:last-child {
-    border-bottom: none;
+    justify-content: space-between;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
 }
 
 .donor-info {
     display: flex;
     align-items: center;
-}
-
-.donor-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 15px;
+    gap: 10px;
 }
 
 .donor-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
 .avatar-placeholder {
-    width: 100%;
-    height: 100%;
-    background-color: var(--primary-light);
-    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: bold;
 }
 
-.donor-details h3 {
-    font-size: 16px;
-    margin-bottom: 5px;
+.donation-status {
+    text-align: right;
 }
 
-.donor-details p {
-    font-size: 14px;
-    color: var(--text-light);
-}
-
-.donation-date {
+.verification-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 12px;
-    color: var(--text-light);
+    font-weight: bold;
+}
+
+.verification-badge.verification-pending {
+    background: #ff9800;
+    color: white;
+}
+
+.verification-badge.verified {
+    background: #4caf50;
+    color: white;
+}
+
+/* Comments Section */
+.comments-section {
+    margin-top: 20px;
+}
+
+.comment-list {
+    margin-top: 10px;
+}
+
+.comment-item {
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.comment-time {
+    font-size: 12px;
+    color: #666;
+}
+
+.comment-content {
+    margin-top: 5px;
+}
+
+.comment-form {
+    margin-top: 15px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.comment-form .btn-primary {
+    margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .request-primary {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .donation-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .donation-status {
+        margin-top: 10px;
+    }
 }
 
 /* Donor Cards */
@@ -516,6 +618,7 @@ section h2::after {
     border-radius: 50%;
     overflow: hidden;
     margin: 0 auto 15px;
+    align-content: center;
 }
 
 .donor-name {
@@ -541,7 +644,7 @@ section h2::after {
 
 /* CTA Section */
 .cta-section {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/static/images/cta-bg.jpg');
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/media/images/ready.png');
     background-size: cover;
     background-position: center;
     color: white;
@@ -607,6 +710,7 @@ section h2::after {
     border-radius: 50%;
     overflow: hidden;
     margin: 0 auto 15px;
+    align-content: center;
 }
 
 .profile-info h2 {
@@ -927,7 +1031,7 @@ section h2::after {
 }
 
 .comment-list {
-    background-color: var(--card-color);
+    background-color: inherit;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

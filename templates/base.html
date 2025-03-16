@@ -7,6 +7,109 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     {% block extra_css %}{% endblock %}
+  <style>
+.main-nav ul {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adds spacing between nav items */
+}
+
+/* Override display flex for dropdown-menu ul */
+.dropdown-menu ul {
+    display: block; /* Ensures dropdown items stack vertically */
+    margin: 0;
+    padding: 0;
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f44336; /* Red shade for visibility */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    /* transition: background 0.3s ease; */
+}
+
+.user-avatar:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+/* Dropdown Styling */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: none;
+    width: 150px;
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu ul {
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu li {
+    list-style: none;
+}
+
+/* Style for both My Profile and Logout */
+.dropdown-menu a,
+.dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Match Logout button with My Profile */
+.btn-logout {
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #333;
+    background: none;
+    border: none;
+}
+
+/* Hover effect for both */
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+    background: #f1f1f1;
+}
+
+
+  </style>
 </head>
 <body>
     <header class="main-header">
@@ -35,21 +138,25 @@
                             </a>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle">
-                                {{ user.username }} <span class="caret">▼</span>
-                            </a>
-                            <ul class="dropdown-menu">
+                            <div class="user-avatar" id="userDropdown">
+                                {{ user.username|first }}
+                            </div>
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <ul>
                                 <li><a href="{% url 'user_profile' user.username %}">My Profile</a></li>
-                                <li><form action="{% url 'logout' %}" method="post" style="display: inline;">
-    {% csrf_token %}
-    <button type="submit">Logout</button>
-</form>
-</li>
-                            </ul>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-logout">Logout</button>
+                                    </form>
+                                </li>
+                                </ul>
+                            </div>
                         </li>
+                        
                     {% else %}
                         <li><a href="{% url 'login' %}">Login</a></li>
-                        <li><a href="{% url 'register' %}" class="btn-primary">Register</a></li>
+                        <li><a style="color: white;" href="{% url 'register' %}" class="btn-primary">Register</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -92,8 +199,8 @@
                 </div>
                 <div class="footer-section">
                     <h3>Contact Us</h3>
-                    <p>Email: info@bloodconnect.org</p>
-                    <p>Phone: +1-234-567-8900</p>
+                    <p>Email: teamnoneofficial@gmail.com</p>
+                    <p>Phone: +91 9063003290</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -102,30 +209,24 @@
         </div>
     </footer>
 
-    <script src="/static/js/main.js"></script>
+    <!-- <script src="/static/js/main.js"></script> -->
     <script>
-        // Fetch notification count
-        function updateNotificationCount() {
-            if (document.getElementById('notification-count')) {
-                fetch('{% url "notification_count" %}')
-                    .then(response => response.json())
-                    .then(data => {
-                        const count = document.getElementById('notification-count');
-                        count.textContent = data.count;
-                        if (data.count > 0) {
-                            count.classList.add('has-notifications');
-                        } else {
-                            count.classList.remove('has-notifications');
-                        }
-                    });
-            }
-        }
+      document.addEventListener('DOMContentLoaded', function() {
+    const userDropdown = document.getElementById('userDropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
 
-        // Update notification count every 30 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            updateNotificationCount();
-            setInterval(updateNotificationCount, 30000);
-        });
+    userDropdown.addEventListener('click', function(event) {
+        event.stopPropagation(); 
+        dropdownMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!userDropdown.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+});
+
     </script>
     {% block extra_js %}{% endblock %}
 </body>

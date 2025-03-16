@@ -16,14 +16,14 @@
             <div class="request-primary">
                 <div class="blood-group-large">{{ blood_request.blood_group }}</div>
                 <div class="request-details">
-                    <h2>{{ blood_request.hospital_name }}</h2>
-                    <p class="hospital-address">{{ blood_request.hospital_address }}</p>
-                    <div class="request-meta">
-                        <span class="urgency-badge urgency-{{ blood_request.urgency }}">
+                    <p style="font-size: 1.5rem;">Hospital :&nbsp;<strong>{{ blood_request.hospital_name }}</strong></p>
+                    <p class="hospital-address">Address : &nbsp;{{ blood_request.hospital_address }}</p>
+                    
+                        <p>
                             {{ blood_request.get_urgency_display }} Urgency
-                        </span>
-                        <span class="units-needed">{{ blood_request.units_needed }} unit(s) needed</span>
-                    </div>
+                        <br>
+                        <span class="units-needed">{{ blood_request.units_needed }} unit(s) needed</span></p>
+                   
                 </div>
             </div>
             
