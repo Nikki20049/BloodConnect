@@ -124,6 +124,7 @@
                     <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="{% url 'search_requests' %}">Find Requests</a></li>
                     <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+                    <li><a href={% url 'other' %}">Other</a></li>
                     {% if user.is_authenticated %}
                         {% if user.user_type == 'donor' %}
                             <li><a href="{% url 'donor_dashboard' %}">Donor Dashboard</a></li>
